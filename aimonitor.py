@@ -14,9 +14,10 @@ Streamlit aplikace pro spuštění a vyhodnocení sady scénářů proti LLM a
 export výsledků do DOCX. Scénáře odpovídají produktovým oblastem Seyfor
 a mají tři jazykové varianty (CS/SK/EN).
 
-Pozn.: Volání LLM je řešeno jednoduše (OpenAI nebo mock). Funkci
-`run_analysis` si snadno rozšíříš o další providery. Export do DOCX je
-implementován bez externích závislostí (ručně vytvořený OOXML balíček).
+Volání LLM:
+- Funkce `call_openai_chat` podporuje nové OpenAI SDK (v1+) i legacy (<=0.28).
+Export do DOCX:
+- Implementováno bez externích závislostí (ručně vytvořený OOXML balíček).
 """
 
 ##########################################################################
@@ -195,6 +196,7 @@ def call_openai_chat(prompt: str, model: str, temperature: float = 0.2, n: int =
     Volání OpenAI s podporou obou verzí SDK:
     - v1+: from openai import OpenAI; client.chat.completions.create(...)
     - legacy (<=0.28): openai.ChatCompletion.create(...)
+    Pokud knihovna chybí nebo není API klíč, vrací mock zprávu.
     """
     # Pokus o nové SDK (v1+)
     try:
@@ -361,8 +363,8 @@ def main() -> None:
     st.title("AI Visibility Monitor – Seyfor Scenarios")
     st.write(
         "Vyberte scénáře a spusťte analýzu. Aplikace podporuje volání modelů "
-        "přes knihovnu OpenAI nebo může vracet mock odpovědi. Po skončení lze "
-        "výsledky stáhnout jako DOCX dokument."
+        "přes OpenAI (nové i legacy SDK) nebo může vracet mock odpovědi. "
+        "Po skončení lze výsledky stáhnout jako DOCX dokument."
     )
 
     # konfigurace
@@ -404,4 +406,9 @@ def main() -> None:
             st.write(f"Persona: {sc['persona']}")
             st.write(f"CS: {sc['cs']}")
             st.write(f"SK: {sc['sk']}")
-            st.write(f"EN: {sc
+            st.write(f"EN: {sc['en']}")
+            st.markdown("---")
+
+
+if __name__ == "__main__":
+    main()
