@@ -11,7 +11,7 @@ Secrets/keys:
 
 This MVP supports:
   - Loading scenarios from a JSON file (or using a tiny built‑in sample)
-  - Calling OpenAI (gpt-4o-mini by default) with n samples per query
+  - Calling OpenAI (gpt-5 by default) with n samples per query
   - Optional Gemini support (if GOOGLE_API_KEY present)
   - Judge/Parser pass to normalize mentions & recommendations (LLM-as-a-judge)
   - SQLite persistence (aivm.db) for raw & parsed results
@@ -310,7 +310,7 @@ with st.sidebar:
     db_path = st.text_input("SQLite DB path", value=DB_PATH_DEFAULT)
     openai_key = st.text_input("OPENAI_API_KEY", value=os.getenv("OPENAI_API_KEY", ""), type="password")
     use_openai = st.checkbox("Use OpenAI", value=True)
-    openai_model = st.selectbox("OpenAI model", ["gpt-4o-mini", "gpt-4o"], index=0)
+    openai_model = st.selectbox("OpenAI model", ["gpt-5"], index=0)
 
     gemini_key = st.text_input("GOOGLE_API_KEY (optional)", value=os.getenv("GOOGLE_API_KEY", ""), type="password")
     use_gemini = st.checkbox("Use Gemini (optional)", value=False, help="Requires google-generativeai package and API key")
