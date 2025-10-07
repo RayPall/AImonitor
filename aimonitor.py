@@ -192,30 +192,51 @@ SCENARIOS = [
 
 def call_openai_chat(prompt: str, model: str, temperature: float = 0.2, n: int = 1, api_key: str | None = None) -> list[str]:
     """
-    Jednoduché volání OpenAI Chat API (pokud chybí knihovna/klíč, vrací mock).
+    Volání OpenAI s podporou obou verzí SDK:
+    - v1+: from openai import OpenAI; client.chat.completions.create(...)
+    - legacy (<=0.28): openai.ChatCompletion.create(...)
     """
+    # Pokus o nové SDK (v1+)
     try:
-        import openai  # type: ignore
-    except ImportError:
-        return [f"[OpenAI library missing] {prompt}"]
-    if not api_key:
-        return [f"[Missing API key] {prompt}"]
-    openai.api_key = api_key
-    messages = [
-        {"role": "system", "content": "You are an unbiased expert consultant."},
-        {"role": "user", "content": prompt},
-    ]
-    try:
-        res = openai.ChatCompletion.create(
-            model=model,
-            messages=messages,
-            temperature=temperature,
-            n=n,
-            max_tokens=800,
-        )
-        return [choice["message"]["content"] for choice in res["choices"]]
-    except Exception as e:
-        return [f"[OpenAI error] {str(e)}"]
+        from openai import OpenAI  # openai>=1.0
+        if not api_key:
+            return [f"[Missing API key] {prompt}"]
+        client = OpenAI(api_key=api_key)
+        outputs: list[str] = []
+        for _ in range(n):
+            resp = client.chat.completions.create(
+                model=model,
+                messages=[
+                    {"role": "system", "content": "You are an unbiased expert consultant."},
+                    {"role": "user", "content": prompt},
+                ],
+                temperature=temperature,
+                max_tokens=800,
+            )
+            outputs.append(resp.choices[0].message.content or "")
+        return outputs
+    except Exception as v1_err:
+        # Fallback na legacy SDK (<=0.28)
+        try:
+            import openai  # type: ignore
+            if not api_key:
+                return [f"[Missing API key] {prompt}"]
+            openai.api_key = api_key
+            outputs: list[str] = []
+            for _ in range(n):
+                resp = openai.ChatCompletion.create(
+                    model=model,
+                    messages=[
+                        {"role": "system", "content": "You are an unbiased expert consultant."},
+                        {"role": "user", "content": prompt},
+                    ],
+                    temperature=temperature,
+                    max_tokens=800,
+                )
+                outputs.append(resp["choices"][0]["message"]["content"])
+            return outputs
+        except Exception as legacy_err:
+            return [f"[OpenAI error] v1={v1_err} | legacy={legacy_err}"]
 
 
 def run_analysis(selected_ids: list[str], provider: str, model: str, n_samples: int, api_key: str | None = None) -> pd.DataFrame:
@@ -383,9 +404,4 @@ def main() -> None:
             st.write(f"Persona: {sc['persona']}")
             st.write(f"CS: {sc['cs']}")
             st.write(f"SK: {sc['sk']}")
-            st.write(f"EN: {sc['en']}")
-            st.markdown("---")
-
-
-if __name__ == "__main__":
-    main()
+            st.write(f"EN: {sc
