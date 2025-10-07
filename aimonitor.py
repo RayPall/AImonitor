@@ -1,46 +1,28 @@
 import streamlit as st
 import pandas as pd
 import json
-import subprocess
 import tempfile
 import base64
 from datetime import datetime
 from pathlib import Path
 
-
 """
 AI Visibility Monitor (Seyfor edition)
 -------------------------------------
 
-This Streamlit application allows you to run and evaluate a set of
-pre-defined scenarios against large language models and then export the
-results as a DOCX document.  The scenarios included here reflect the
-current product portfolio of Seyfor as analysed on their website.  Each
-scenario contains a persona description, a high-level context and three
-language variants (Czech, Slovak and English) so that you can measure
-responses across markets.
+Streamlit aplikace pro spuštění a vyhodnocení sady scénářů proti LLM a
+export výsledků do DOCX. Scénáře odpovídají produktovým oblastem Seyfor
+a mají tři jazykové varianty (CS/SK/EN).
 
-The application is designed as a starting point—you can extend it to
-call real APIs (OpenAI, Gemini, etc.) by supplying your API keys.
-However, since this environment does not include those libraries by
-default, the `run_analysis` function returns a simple placeholder
-response.  When running locally, install the appropriate SDKs and
-update `run_analysis` accordingly.
+Pozn.: Volání LLM je řešeno jednoduše (OpenAI nebo mock). Funkci
+`run_analysis` si snadno rozšíříš o další providery. Export do DOCX je
+implementován bez externích závislostí (ručně vytvořený OOXML balíček).
 """
 
-
 ##########################################################################
-# Scenario definitions
+# Scénáře (20) přizpůsobené Seyfor
 ##########################################################################
 
-# Each scenario is a dictionary containing:
-# - id: unique identifier
-# - persona: short description of the target persona
-# - context: why the user is asking
-# - cs/sk/en: question wording in Czech, Slovak and English
-#
-# The list below reflects the 20 scenarios tailored to the Seyfor
-# product portfolio.  See the accompanying report for more details.
 SCENARIOS = [
     {
         "id": "S01_cloud_accounting",
@@ -204,17 +186,13 @@ SCENARIOS = [
     },
 ]
 
-
 ##########################################################################
-# Helper functions
+# Helpery
 ##########################################################################
 
 def call_openai_chat(prompt: str, model: str, temperature: float = 0.2, n: int = 1, api_key: str | None = None) -> list[str]:
     """
-    Call the OpenAI ChatCompletion endpoint and return a list of responses.  If the
-    openai package is not installed or the API key is missing, a placeholder
-    response is returned.  The function is separated so that you can swap it
-    easily for other providers (e.g. Gemini) or add your own logic.
+    Jednoduché volání OpenAI Chat API (pokud chybí knihovna/klíč, vrací mock).
     """
     try:
         import openai  # type: ignore
@@ -223,7 +201,6 @@ def call_openai_chat(prompt: str, model: str, temperature: float = 0.2, n: int =
     if not api_key:
         return [f"[Missing API key] {prompt}"]
     openai.api_key = api_key
-    # Safety: limit tokens so we don't exhaust quotas
     messages = [
         {"role": "system", "content": "You are an unbiased expert consultant."},
         {"role": "user", "content": prompt},
@@ -243,10 +220,8 @@ def call_openai_chat(prompt: str, model: str, temperature: float = 0.2, n: int =
 
 def run_analysis(selected_ids: list[str], provider: str, model: str, n_samples: int, api_key: str | None = None) -> pd.DataFrame:
     """
-    Iterate over selected scenarios, call the chosen LLM provider and
-    aggregate the results into a DataFrame.  This implementation uses
-    OpenAI as the default provider; extend this function to support
-    additional providers.
+    Iterace přes vybrané scénáře, volání LLM a sběr odpovědí do DataFrame.
+    Provider 'openai' používá call_openai_chat, jinak vrací mock odpovědi.
     """
     rows = []
     for sc in SCENARIOS:
@@ -254,11 +229,9 @@ def run_analysis(selected_ids: list[str], provider: str, model: str, n_samples: 
             continue
         for lang_key in ["cs", "sk", "en"]:
             query = sc[lang_key]
-            responses: list[str]
             if provider.lower() == "openai":
                 responses = call_openai_chat(query, model=model, n=n_samples, api_key=api_key)
             else:
-                # Placeholder for other providers; replicate the query as response
                 responses = [f"[Mock response] {query}" for _ in range(n_samples)]
             for i, resp in enumerate(responses):
                 rows.append(
@@ -272,68 +245,70 @@ def run_analysis(selected_ids: list[str], provider: str, model: str, n_samples: 
                         "raw_text": resp,
                     }
                 )
-    df = pd.DataFrame(rows)
-    return df
+    return pd.DataFrame(rows)
 
 
 def export_dataframe_to_docx(df: pd.DataFrame) -> Path:
     """
-    Export the given DataFrame to a DOCX file **without** external Python
-    dependencies (no python-docx / tabulate needed).  We build a minimal
-    Office Open XML package (DOCX is a ZIP) with a very simple document
-    body that lists the table rows as plain text.  This guarantees a .docx
-    output even in restricted environments.
+    Export DataFrame do validního DOCX bez externích knihoven.
+    Vytvoříme minimální OOXML balíček:
+      - [Content_Types].xml
+      - _rels/.rels       (odkaz na /word/document.xml)
+      - word/document.xml (obsah)
     """
-    import zipfile
-    import html
+    import zipfile, html, tempfile
+    from pathlib import Path
 
     tmp_dir = tempfile.mkdtemp()
     docx_path = Path(tmp_dir) / "results.docx"
 
-    # Build a very simple Word document.xml content (paragraph per row)
-    def escape(s: str) -> str:
-        return html.escape(s, quote=True)
+    # --- obsah dokumentu: jednoduché odstavce (header + řádky tabulky) ---
+    def esc(s: str) -> str:
+        return html.escape(s if s is not None else "", quote=True)
 
     lines = []
-    # Header row
     headers = list(df.columns)
     lines.append(" | ".join([str(h) for h in headers]))
     lines.append("-" * 8)
-    # Data rows
     for _, row in df.iterrows():
         vals = ["" if pd.isna(v) else str(v) for v in row.to_list()]
         lines.append(" | ".join(vals))
 
-    text = "\n".join(lines)
+    text_lines = [esc("AI Visibility Monitor – Results")] + [esc(l) for l in lines]
 
-    document_xml = f"""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
-  <w:body>
-    <w:p><w:r><w:t>AI Visibility Monitor – Results</w:t></w:r></w:p>
-    {"".join(f'<w:p><w:r><w:t>{escape(line)}</w:t></w:r></w:p>' for line in text.split("\\n"))}
-    <w:sectPr/>
-  </w:body>
-</w:document>
-"""
+    document_xml = (
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+        '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">'
+        "<w:body>"
+        + "".join(f"<w:p><w:r><w:t>{line}</w:t></w:r></w:p>" for line in text_lines)
+        + '<w:sectPr><w:pgSz w:w="12240" w:h="15840"/></w:sectPr>'
+        "</w:body>"
+        "</w:document>"
+    )
 
-    rels_xml = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-</Relationships>
-"""
+    # hlavní RELS – musí ukazovat na word/document.xml
+    rels_xml = (
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+        '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+        '<Relationship Id="rId1" '
+        'Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" '
+        'Target="word/document.xml"/>'
+        "</Relationships>"
+    )
 
-    content_types_xml = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
-  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
-  <Default Extension="xml" ContentType="application/xml"/>
-  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
-</Types>
-"""
+    content_types_xml = (
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+        '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
+        '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'
+        '<Default Extension="xml" ContentType="application/xml"/>'
+        '<Override PartName="/word/document.xml" '
+        'ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>'
+        "</Types>"
+    )
 
-    # Write the ZIP structure
     with zipfile.ZipFile(docx_path, "w", compression=zipfile.ZIP_DEFLATED) as z:
         z.writestr("[Content_Types].xml", content_types_xml)
         z.writestr("_rels/.rels", rels_xml)
-        z.writestr("word/_rels/document.xml.rels", rels_xml)
         z.writestr("word/document.xml", document_xml)
 
     return docx_path
@@ -341,10 +316,7 @@ def export_dataframe_to_docx(df: pd.DataFrame) -> Path:
 
 def get_download_link(file_path: Path, filename: str) -> str:
     """
-    Create a download link for the given file by encoding its
-    contents in base64.  Streamlit will render this as an anchor
-    element; clicking it will trigger a download.  The MIME type is
-    chosen based on the file extension.
+    Vytvoří <a> odkaz pro stažení souboru (data URL, base64).
     """
     data = file_path.read_bytes()
     mime_map = {
@@ -355,12 +327,8 @@ def get_download_link(file_path: Path, filename: str) -> str:
     ext = file_path.suffix.lower()
     mime = mime_map.get(ext, "application/octet-stream")
     b64 = base64.b64encode(data).decode()
-    # ext may start with a dot; remove leading dot for label
-    file_ext = ext.upper().lstrip(".")
-    # Create an HTML anchor tag that will trigger a download when clicked.  We
-    # avoid nested quotes that would break attribute parsing by building the
-    # label separately.
-    return f'<a href="data:{mime};base64,{b64}" download="{filename}">Download {file_ext} file</a>'
+    label = ext.upper().lstrip(".")
+    return f'<a href="data:{mime};base64,{b64}" download="{filename}">Download {label} file</a>'
 
 
 ##########################################################################
@@ -376,14 +344,14 @@ def main() -> None:
         "výsledky stáhnout jako DOCX dokument."
     )
 
-    # Sidebar: configuration
+    # konfigurace
     st.sidebar.header("Configuration")
     provider = st.sidebar.selectbox("Provider", ["openai", "mock"], index=1)
     model = st.sidebar.text_input("Model name", value="gpt-4o-mini")
     api_key = st.sidebar.text_input("API key (OpenAI)", type="password")
     n_samples = st.sidebar.slider("Samples per query", min_value=1, max_value=5, value=1)
 
-    # Scenario selection
+    # výběr scénářů
     st.subheader("Select scenarios")
     scenario_labels = [f"{sc['id']} – {sc['context']}" for sc in SCENARIOS]
     selected_labels = st.multiselect(
@@ -401,15 +369,14 @@ def main() -> None:
             st.subheader("Results")
             st.dataframe(df_results)
 
-            # Allow download as DOCX
+            # Export do DOCX
             st.subheader("Export")
             docx_path = export_dataframe_to_docx(df_results)
-            # Determine filename with timestamp
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             filename = f"aivm_results_{timestamp}.docx"
             st.markdown(get_download_link(docx_path, filename), unsafe_allow_html=True)
 
-    # Display scenario definitions for reference
+    # náhled scénářů
     with st.expander("Show scenario details"):
         for sc in SCENARIOS:
             st.markdown(f"**{sc['id']}** – {sc['context']}")
