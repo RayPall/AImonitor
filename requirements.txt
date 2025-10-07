@@ -1,3 +1,7 @@
+# ── core ─────────────────────────────────────────────
 streamlit>=1.36
+pandas>=2.0
 openai>=1.40
-google-generativeai>=0.7.2
+
+# ── optional (můžeš kdykoli odstranit) ──────────────
+python-dotenv>=1.0    # načítání OPENAI_API_KEY z .env
