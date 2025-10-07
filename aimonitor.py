@@ -16,6 +16,8 @@ a mají tři jazykové varianty (CS/SK/EN).
 
 Volání LLM:
 - Funkce `call_openai_chat` podporuje nové OpenAI SDK (v1+) i legacy (<=0.28).
+  V novém SDK používá parametr `max_completion_tokens`.
+
 Export do DOCX:
 - Implementováno bez externích závislostí (ručně vytvořený OOXML balíček).
 """
@@ -194,8 +196,8 @@ SCENARIOS = [
 def call_openai_chat(prompt: str, model: str, temperature: float = 0.2, n: int = 1, api_key: str | None = None) -> list[str]:
     """
     Volání OpenAI s podporou obou verzí SDK:
-    - v1+: from openai import OpenAI; client.chat.completions.create(...)
-    - legacy (<=0.28): openai.ChatCompletion.create(...)
+    - v1+: from openai import OpenAI; client.chat.completions.create(..., max_completion_tokens=...)
+    - legacy (<=0.28): openai.ChatCompletion.create(..., max_tokens=...)
     Pokud knihovna chybí nebo není API klíč, vrací mock zprávu.
     """
     # Pokus o nové SDK (v1+)
@@ -213,7 +215,8 @@ def call_openai_chat(prompt: str, model: str, temperature: float = 0.2, n: int =
                     {"role": "user", "content": prompt},
                 ],
                 temperature=temperature,
-                max_tokens=800,
+                # Pozor: v1 používá nový název parametru
+                max_completion_tokens=800,
             )
             outputs.append(resp.choices[0].message.content or "")
         return outputs
