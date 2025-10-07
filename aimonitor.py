@@ -13,10 +13,10 @@ AI Visibility Monitor (Seyfor edition)
 -------------------------------------
 
 This Streamlit application allows you to run and evaluate a set of
-pre‑defined scenarios against large language models and then export the
+pre-defined scenarios against large language models and then export the
 results as a DOCX document.  The scenarios included here reflect the
 current product portfolio of Seyfor as analysed on their website.  Each
-scenario contains a persona description, a high‑level context and three
+scenario contains a persona description, a high-level context and three
 language variants (Czech, Slovak and English) so that you can measure
 responses across markets.
 
@@ -46,17 +46,17 @@ SCENARIOS = [
         "id": "S01_cloud_accounting",
         "persona": "živnostník / OSVČ",
         "context": "cloudové účetnictví s EET a mobilní aplikací",
-        "cs": "Jaký cloudový účetní software s podporou EET a mobilní aplikací doporučíte pro živnostníka v ČR?",
-        "sk": "Aký online účtovný softvér s EET a mobilnou aplikáciou odporučíte pre živnostníka v SR?",
+        "cs": "Jaký cloudový účetní software s podporou EET a mobilní aplikací doporučíte pro živnostníka v ČR?",
+        "sk": "Aký online účtovný softvér s EET a mobilnou aplikáciou odporučíte pre živnostníka v SR?",
         "en": "Which cloud-based accounting tool with EET integration and a mobile app would you recommend for a sole trader in the Czech Republic?",
     },
     {
         "id": "S02_onprem_accounting",
         "persona": "účetní malé s.r.o.",
-        "context": "on‑premise účetní software s moduly a freemium verzí",
-        "cs": "Jaký účetní program pro malé firmy nabízí on‑premise instalaci, široký výběr modulů a freemium verzi?",
+        "context": "on-premise účetní software s moduly a freemium verzí",
+        "cs": "Jaký účetní program pro malé firmy nabízí on-premise instalaci, široký výběr modulů a freemium verzi?",
         "sk": "Aký účtovný softvér pre malé firmy má lokálnu inštaláciu, veľa modulov a je dostupný aj zadarmo?",
-        "en": "Which on‑premise accounting software for small companies provides rich modular functions and a free tier?",
+        "en": "Which on-premise accounting software for small companies provides rich modular functions and a free tier?",
     },
     {
         "id": "S03_modern_erp_sme",
@@ -77,7 +77,7 @@ SCENARIOS = [
     {
         "id": "S05_erp_small_manufacturing",
         "persona": "výrobní manažer menší fabriky",
-        "context": "ERP s řízením výroby a rozšiřitelností",
+        "context": "ERP s řízením výroby a rozšiřitelností",
         "cs": "Jaký ERP systém doporučíte pro malý výrobní podnik, který potřebuje řízení výroby a snadnou rozšiřitelnost?",
         "sk": "Aký ERP odporúčate pre menšiu výrobnú firmu so správou výroby a vysokou rozšíriteľnosťou?",
         "en": "Which ERP would you suggest for a small manufacturing company that needs production management and great extensibility?",
@@ -94,39 +94,39 @@ SCENARIOS = [
         "id": "S07_enterprise_ai",
         "persona": "CIO korporace",
         "context": "pokročilé ERP/CRM s AI, rychlou implementací a integrací do Microsoft 365",
-        "cs": "Jaký systém s rychlou implementací, pokročilou AI a úzkou integrací s Microsoft 365 doporučíte pro velkou firmu?",
-        "sk": "Aký systém s rýchlou implementáciou, AI funkciami a integráciou do Microsoft 365 je vhodný pre veľký podnik?",
-        "en": "Which enterprise system with fast implementation, AI features and deep Microsoft 365 integration would you recommend for a large company?",
+        "cs": "Jaký systém s rychlou implementací, pokročilou AI a úzkou integrací s Microsoft 365 doporučíte pro velkou firmu?",
+        "sk": "Aký systém s rýchlou implementáciou, AI funkciami a integráciou do Microsoft 365 je vhodný pre veľký podnik?",
+        "en": "Which enterprise system with fast implementation, AI features and deep Microsoft 365 integration would you recommend for a large company?",
     },
     {
         "id": "S08_energy_system",
         "persona": "provozní ředitel energetické firmy",
         "context": "modulární IS pro energetiku",
-        "cs": "Jaký informační systém je vhodný pro energetické společnosti a umožňuje sestavit řešení z modulů?",
-        "sk": "Aký informačný systém je vhodný pre energetické podniky a dá sa poskladať z jednotlivých modulov?",
+        "cs": "Jaký informační systém je vhodný pro energetické společnosti a umožňuje sestavit řešení z modulů?",
+        "sk": "Aký informačný systém je vhodný pre energetické podniky a dá sa poskladať z jednotlivých modulov?",
         "en": "What information system is tailored for energy companies and lets you build a flexible solution from modules?",
     },
     {
         "id": "S09_leasing",
         "persona": "manažer leasingové nebo úvěrové společnosti",
-        "context": "řešení pro leasing, úvěry a hypotéky nad Dynamics 365 BC",
-        "cs": "Který software pokrývá finanční a operativní leasing, úvěry i hypotéky a navazuje na Dynamics 365 Business Central?",
-        "sk": "Aké riešenie pokrýva operatívny a finančný leasing, pôžičky či hypotéky a je superštruktúrou nad Dynamics 365 Business Central?",
-        "en": "Which solution handles operational leasing, loans and mortgages and works as an extension of Dynamics 365 Business Central?",
+        "context": "řešení pro leasing, úvěry a hypotéky nad Dynamics 365 BC",
+        "cs": "Který software pokrývá finanční a operativní leasing, úvěry i hypotéky a navazuje na Dynamics 365 Business Central?",
+        "sk": "Aké riešenie pokrýva operatívny a finančný leasing, pôžičky či hypotéky a je superštruktúrou nad Dynamics 365 Business Central?",
+        "en": "Which solution handles operational leasing, loans and mortgages and works as an extension of Dynamics 365 Business Central?",
     },
     {
         "id": "S10_cloud_pos",
         "persona": "majitel kavárny/krámku",
         "context": "cloudová pokladna pro gastro a malé obchody",
         "cs": "Jaký cloudový pokladní systém s jednoduchým ovládáním a otevřeným API doporučíte pro restauraci nebo malý obchod?",
-        "sk": "Aký pokladničný systém v cloude s jednoduchým ovládaním a otvoreným API odporučíte pre gastro alebo malý obchod?",
+        "sk": "Aký pokladničný systém v cloude s jednoduchým ovládaním a otvoreným API odporučíte pre gastro alebo malý obchod?",
         "en": "Which cloud-based POS system with simple operation and an open API would you recommend for a café or small shop?",
     },
     {
         "id": "S11_chain_pos",
         "persona": "provozní manažer maloobchodního řetězce",
         "context": "POS pro řetězce/franšízy s customizací a replikací dat",
-        "cs": "Jaké řešení pro pokladny u řetězců a franšíz nabízí rozsáhlé možnosti úprav, unikátní replikaci dat a integraci věrnostních programů?",
+        "cs": "Jaké řešení pro pokladny u řetězců a franšíz nabízí rozsáhlé možnosti úprav, unikátní replikaci dat a integraci věrnostních programů?",
         "sk": "Aký POS systém pre reťazce a franšízy ponúka veľké možnosti úprav, jedinečnú replikáciu dát a ekosystém doplnkov?",
         "en": "Which POS solution for retail chains and franchises offers wide customization, unique data replication and an ecosystem of extensions such as loyalty programs?",
     },
@@ -135,7 +135,7 @@ SCENARIOS = [
         "persona": "drobný prodejce na trhu",
         "context": "bezplatná multiplatformní aplikace pro tisk účtenek",
         "cs": "Existuje bezplatná pokladní aplikace pro iOS, Android či Windows, která umí tisknout účtenky a odesílat je na finanční správu?",
-        "sk": "Je k dispozícii bezplatná pokladničná aplikácia pre iOS, Android alebo Windows, ktorá vytlačí účtenky a odošle ich finančnej správe?",
+        "sk": "Je k dispozícii bezplatná pokladničná aplikácia pre iOS, Android alebo Windows, ktorá vytlačí účtenky a odošle ich finančnej správe?",
         "en": "Is there a free receipt app for iOS, Android or Windows that can print receipts and submit them to the tax authority?",
     },
     {
@@ -167,24 +167,24 @@ SCENARIOS = [
         "persona": "vedoucí prodeje",
         "context": "obchodní systém pro řízení pipeline a marketing",
         "cs": "Jaký obchodní systém pomůže monitorovat vztahy se zákazníky od potenciálu po objednávku a vytvářet marketingové kampaně i servisní případy?",
-        "sk": "Aký systém pre obchod dokáže sledovať cestu zákazníka od potenciálu k objednávke a tvoriť marketingové zoznamy i servisné prípady?",
+        "sk": "Aký systém pre obchod dokáže sledovať cestu zákazníka od potenciálu k objednávke a tvoriť marketingové zoznamy i servisné prípady?",
         "en": "Which sales system helps track customer relationships from leads to orders and supports creation of marketing lists and service cases?",
     },
     {
         "id": "S17_crm_light_power",
         "persona": "majitel startupu",
         "context": "lehký CRM nástroj na Power Platform",
-        "cs": "Existuje lehké CRM založené na technologii Microsoft Power Platform, které lze rychle nasadit a centralizuje obchodní informace?",
-        "sk": "Je dostupný ľahký CRM nástroj postavený na Microsoft Power Platform, ktorý sa dá rýchlo nasadiť a centralizuje obchodné informácie?",
-        "en": "Is there a lightweight CRM tool built on Microsoft Power Platform that can be quickly implemented and centralizes business information?",
+        "cs": "Existuje lehké CRM založené na technologii Microsoft Power Platform, které lze rychle nasadit a centralizuje obchodní informace?",
+        "sk": "Je dostupný ľahký CRM nástroj postavený na Microsoft Power Platform, ktorý sa dá rýchlo nasadiť a centralizuje obchodné informácie?",
+        "en": "Is there a lightweight CRM tool built on Microsoft Power Platform that can be quickly implemented and centralizes business information?",
     },
     {
         "id": "S18_planning_forecasting",
         "persona": "controlling manažer velké firmy",
-        "context": "plánování, rozpočty a forecasting s multi‑level zapojením",
+        "context": "plánování, rozpočty a forecasting s multi-level zapojením",
         "cs": "Jaké řešení pro plánování, rozpočty a forecasting umožní zapojit lidi na různých úrovních a vytvářet průběžné finanční prognózy?",
-        "sk": "Aké riešenie na plánovanie, rozpočty a prognózy umožní zapojiť viacero úrovní v spoločnosti a tvoriť priebežné finančné predpovede?",
-        "en": "Which planning and forecasting solution allows multi‑level involvement across the company and provides continuous financial forecasts?",
+        "sk": "Aké riešenie na plánovanie, rozpočty a prognózy umožní zapojiť viacero úrovní v spoločnosti a tvoriť priebežné finančné predpovede?",
+        "en": "Which planning and forecasting solution allows multi-level involvement across the company and provides continuous financial forecasts?",
     },
     {
         "id": "S19_data_warehouse_reporting",
@@ -199,7 +199,7 @@ SCENARIOS = [
         "persona": "IT manažer ve větší společnosti",
         "context": "kybernetická bezpečnost a moderní digitální pracoviště",
         "cs": "Jaké řešení zahrnuje správu koncových zařízení, identit a zabezpečení sítě (NGFW/UTM) a zároveň poskytuje platformu pro moderní digitální pracoviště?",
-        "sk": "Aké riešenie spája správu zariadení, správu identít a sieťovú bezpečnosť (NGFW/UTM) s podporou moderného digitálneho pracoviska?",
+        "sk": "Aké riešenie spája správu zariadení, správu identít a sieťovú bezpečnosť (NGFW/UTM) s podporou moderného digitálneho pracoviska?",
         "en": "Which solution combines endpoint and identity management with network security (NGFW/UTM) and supports a modern digital workplace environment?",
     },
 ]
@@ -278,48 +278,64 @@ def run_analysis(selected_ids: list[str], provider: str, model: str, n_samples: 
 
 def export_dataframe_to_docx(df: pd.DataFrame) -> Path:
     """
-    Export the given DataFrame to a DOCX file using pandoc.  The function
-    writes a temporary markdown file containing the DataFrame in
-    pipe-table format, invokes pandoc to produce a DOCX, and returns
-    the path to the generated file.  Pandoc must be available in the
-    runtime environment.
+    Export the given DataFrame to a DOCX file **without** external Python
+    dependencies (no python-docx / tabulate needed).  We build a minimal
+    Office Open XML package (DOCX is a ZIP) with a very simple document
+    body that lists the table rows as plain text.  This guarantees a .docx
+    output even in restricted environments.
     """
-    # Use a temporary directory to avoid clutter
-    tmp_dir = tempfile.mkdtemp()
-    md_path = Path(tmp_dir) / "results.md"
-    docx_path = Path(tmp_dir) / "results.docx"
-    # Convert DataFrame to a simple pipe table in Markdown.  Avoid using
-    # pandas.DataFrame.to_markdown() because it depends on the optional
-    # 'tabulate' package, which may not be available.  Instead, build
-    # the markdown manually.
-    def dataframe_to_markdown(df: pd.DataFrame) -> str:
-        # Header row
-        headers = list(df.columns)
-        header_line = "| " + " | ".join(str(h) for h in headers) + " |"
-        # Separator row (use three dashes for each column)
-        separator = "| " + " | ".join(["---"] * len(headers)) + " |"
-        # Data rows
-        data_lines: list[str] = []
-        for _, row in df.iterrows():
-            cells = [str(row[h]) for h in headers]
-            data_lines.append("| " + " | ".join(cells) + " |")
-        return "\n".join([header_line, separator] + data_lines)
+    import zipfile
+    import html
 
-    md_table = dataframe_to_markdown(df)
-    md_path.write_text(md_table, encoding="utf-8")
-    # Use pandoc to convert to DOCX
-    try:
-        subprocess.run([
-            "pandoc",
-            str(md_path),
-            "-o",
-            str(docx_path),
-        ], check=True)
-    except Exception as e:
-        # If pandoc fails, write the markdown as plain text into a DOCX-like zip
-        # fallback: return markdown path
-        # In Streamlit we will embed the markdown file if DOCX is not generated
-        return md_path
+    tmp_dir = tempfile.mkdtemp()
+    docx_path = Path(tmp_dir) / "results.docx"
+
+    # Build a very simple Word document.xml content (paragraph per row)
+    def escape(s: str) -> str:
+        return html.escape(s, quote=True)
+
+    lines = []
+    # Header row
+    headers = list(df.columns)
+    lines.append(" | ".join([str(h) for h in headers]))
+    lines.append("-" * 8)
+    # Data rows
+    for _, row in df.iterrows():
+        vals = ["" if pd.isna(v) else str(v) for v in row.to_list()]
+        lines.append(" | ".join(vals))
+
+    text = "\n".join(lines)
+
+    document_xml = f"""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:body>
+    <w:p><w:r><w:t>AI Visibility Monitor – Results</w:t></w:r></w:p>
+    {"".join(f'<w:p><w:r><w:t>{escape(line)}</w:t></w:r></w:p>' for line in text.split("\\n"))}
+    <w:sectPr/>
+  </w:body>
+</w:document>
+"""
+
+    rels_xml = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+</Relationships>
+"""
+
+    content_types_xml = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+</Types>
+"""
+
+    # Write the ZIP structure
+    with zipfile.ZipFile(docx_path, "w", compression=zipfile.ZIP_DEFLATED) as z:
+        z.writestr("[Content_Types].xml", content_types_xml)
+        z.writestr("_rels/.rels", rels_xml)
+        z.writestr("word/_rels/document.xml.rels", rels_xml)
+        z.writestr("word/document.xml", document_xml)
+
     return docx_path
 
 
@@ -342,13 +358,9 @@ def get_download_link(file_path: Path, filename: str) -> str:
     # ext may start with a dot; remove leading dot for label
     file_ext = ext.upper().lstrip(".")
     # Create an HTML anchor tag that will trigger a download when clicked.  We
-    # avoid nested quotes that would break the f‑string by computing
-    # file_ext separately.
-    return (
-        f'<a href="data:{mime};base64,{b64}" download="{filename}">'  # link
-        f'Download {file_ext} file'
-        f'</a>'
-    )
+    # avoid nested quotes that would break attribute parsing by building the
+    # label separately.
+    return f'<a href="data:{mime};base64,{b64}" download="{filename}">Download {file_ext} file</a>'
 
 
 ##########################################################################
@@ -394,13 +406,8 @@ def main() -> None:
             docx_path = export_dataframe_to_docx(df_results)
             # Determine filename with timestamp
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            if docx_path.suffix == ".docx":
-                filename = f"aivm_results_{timestamp}.docx"
-                st.markdown(get_download_link(docx_path, filename), unsafe_allow_html=True)
-            else:
-                # Fallback: provide markdown file
-                filename = f"aivm_results_{timestamp}.md"
-                st.markdown(get_download_link(docx_path, filename), unsafe_allow_html=True)
+            filename = f"aivm_results_{timestamp}.docx"
+            st.markdown(get_download_link(docx_path, filename), unsafe_allow_html=True)
 
     # Display scenario definitions for reference
     with st.expander("Show scenario details"):
